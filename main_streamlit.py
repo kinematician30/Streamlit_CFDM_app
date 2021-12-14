@@ -61,7 +61,7 @@ with stat_cont:
 
 # The first dataset
       st.subheader('First Dataset')
-      data = (get_data('preview_project\data\sampled_creditcard.csv', "Unnamed: 0", 1)) # first dataset
+      data = (get_data('data\sampled_creditcard.csv', "Unnamed: 0", 1)) # first dataset
       # Counting the values of the Target variables
       data_vc = pd.DataFrame(data['Class'].value_counts())
       data_list = data.columns.to_list() # listing out the variables of the dataset
@@ -84,7 +84,7 @@ with stat_cont:
 # Second Dataset
       st.subheader('Second Dataset')
 
-      data_1 = get_data('preview_project\data\BalancedCreditCardDataset.csv', "Unnamed: 0", 1) # second dataset
+      data_1 = get_data('data\BalancedCreditCardDataset.csv', "Unnamed: 0", 1) # second dataset
       data_1_vc = pd.DataFrame(data_1['Class'].value_counts())
       data_1_list = data_1.columns.to_list()
       # write up for the second dataset

@@ -43,7 +43,8 @@ with header_cont: # Creating a container that keep in the header and introductio
                         fraud detection model and this web app is used to show the walk through of the project
                          from the balancing of the dataset to the model buiding. out of the five models used while
                         buliding the model three were used in this webapp Namely: [Decision Tree Classfier],
-                        [Random Forest Classifier] and [Extreme Gradient Boosting].
+                        [Random Forest Classifier] and [Extreme Gradient Boosting]. Check out the source code on GitHub
+                        https://github.com/kinematic2002/Streamlit_CFDM_app
 
       ''')
 

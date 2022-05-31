@@ -58,5 +58,5 @@ seaborn==0.11.2
 Send2Trash==1.8.0
 six==1.16.0
 smmap==5.0.0
-streamlit==1.2.0
+streamlit==1.9.0
 xgboost==1.5.1

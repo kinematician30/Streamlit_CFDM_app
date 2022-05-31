@@ -1,12 +1,17 @@
-#Imports
+# Imports
 import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib as plt
 import seaborn as sns
+# Model Building
+# imports for model algorithms and model evaluation
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+import xgboost as xgb
 
 st.markdown(
-      '''
+    '''
       <style>
       .reportview-container .main .block-container{{
         max-width: 90%;
@@ -16,107 +21,109 @@ st.markdown(
         padding-bottom: 5rem;
     }}
     img{{
-    	max-width:40%;
-    	margin-bottom:40px;
+      max-width:40%;
+      margin-bottom:40px;
     }}
       </style>
       ''',
-      unsafe_allow_html=True
+    unsafe_allow_html=True
 )
 ###################################################
 
 header_cont = st.container()
 stat_cont = st.container()
 
+with header_cont:  # Creating a container that keep in the header and introduction
+    st.title('Credit card Fraud Detector WebApp')
 
-with header_cont: # Creating a container that keep in the header and introduction
-      st.title('Creditcard Fraud Detector WebApp')
-    
+    col_1, col_2 = st.columns([1, 2])
+    with col_1:
+        st.subheader('Introduction')
 
-      
-      col_1, col_2 = st.columns([1,2])
-      with col_1:
-            st.subheader('Introduction')
-
-      with col_2:
-            st.write('''In this data science project I would be building a credit card 
-                        fraud detection model and this web app is used to show the walk through of the project
-                         from the balancing of the dataset to the model buiding. out of the five models used while
-                        buliding the model three were used in this webapp Namely: [Decision Tree Classfier],
-                        [Random Forest Classifier] and [Extreme Gradient Boosting]. Check out the source code on GitHub
-                        https://github.com/kinematic2002/Streamlit_CFDM_app
+    with col_2:
+        st.write('''In this data science project I would be building a credit card 
+                    fraud detection model and this web app is used to show the walk through 
+                    of  the project from the balancing of the dataset to the model building. 
+                    out of the five models used while building the model three were used in 
+                    this webapp Namely: [Decision Tree Classifier], [Random Forest 
+                    Classifier] and [Extreme Gradient Boosting]. 
+                    Check out the source code on GitHub
+                    https://github.com/kinematic2002/Streamlit_CFDM_app
 
       ''')
+
 
 @st.cache
 def get_data(filename, file_drop, axis):  # this function get the data 
-            dt = pd.read_csv(filename)    # Instead of reading datas multiple times
-            if file_drop and axis == None:
-                  pass 
-            else:
-                  dt.drop(file_drop, axis=axis, inplace=True)
-            return dt
+    dt = pd.read_csv(filename)  # Instead of reading dataset multiple times
+    if file_drop and axis is None:
+        pass
+    else:
+        dt.drop(file_drop, axis=axis, inplace=True)
+    return dt
+
 
 with stat_cont:
-      st.header("Datasets")
+    st.header("Datasets")
 
-# The first dataset
-      st.subheader('First Dataset')
-      data = (get_data('sampled_creditcard.csv', "Unnamed: 0", 1)) # first dataset
-      # Counting the values of the Target variables
-      data_vc = pd.DataFrame(data['Class'].value_counts())
-      data_list = data.columns.to_list() # listing out the variables of the dataset
-      st.write(f'''The first Data set provided has the shape {data.shape} and contained the variables
-            {data_list} but was not used to build the model because of its imbalanced nature were the class
-            variable(Target) had 2000 valid transctions and 492 fraudlent transactions which will not be 
-            enough to predict and get the best accuracy for this model.
-      ''')
-      # showing the dataset and visualizing the values of the target variable
-      st.write(pd.DataFrame(data).head(50))
-      st.bar_chart(data_vc, width=600, height=400)
+    # The first dataset
+    st.subheader('First Dataset')
+    data = (get_data('data/sampled_creditcard.csv', "Unnamed: 0", 1))  # first dataset
+    # Counting the values of the Target variables
+    data_vc = pd.DataFrame(data['Class'].value_counts())
+    data_list = data.columns.to_list()  # listing out the variables of the dataset
+    st.write(f'''The first Data set provided has the shape {data.shape} and contained the variables
+            {data_list} but was not used to build the model because of its imbalanced nature were 
+            the class variable(Target) had 2000 valid transactions and 492 fraudulent transactions 
+            which will not be enough to predict and get the best accuracy for this model. ''')
+    # showing the dataset and visualizing the values of the target variable
+    st.write(pd.DataFrame(data).head(50))
+    st.bar_chart(data_vc, width=600, height=400)
 
-      # getting the number of the fraudlent transaction and Valid transaction.....
-      fraud = data[data['Class']==1]
-      normal = data[data['Class'] == 0]
-      st.write ('Fraudlent Transactions of the first dataset(1): {}'.format(len(fraud)))
-      st.write('Non-Fraudlent Transactions of the first dataset(0): {}'.format(len(normal)))
-      st.write(f'Number Classes: {len(np.unique(data["Class"]))}')
+    # getting the number of the fraudulent transaction and Valid transaction.....
+    fraud = data[data['Class'] == 1]
+    normal = data[data['Class'] == 0]
+    st.write('Fraudulent Transactions of the first dataset(1): {}'.format(len(fraud)))
+    st.write('Non-Fraudulent Transactions of the first dataset(0): {}'.format(len(normal)))
+    st.write(f'Number Classes: {len(np.unique(data["Class"]))}')
 
-# Second Dataset
-      st.subheader('Second Dataset')
+    # Second Dataset
+    st.subheader('Second Dataset')
 
-      data_1 = get_data('BalancedCreditCardDataset.csv', "Unnamed: 0", 1) # second dataset
-      data_1_vc = pd.DataFrame(data_1['Class'].value_counts())
-      data_1_list = data_1.columns.to_list()
-      # write up for the second dataset
-      st.write(f'''The second Data set provided has the shape {data_1.shape} and contained the variables
-            {data_1_list} which was used to build the model because of it was balanced from the first dataset
-            the class variable(Target) had 2000 valid transctions and 2000 fraudlent transactions 
+    data_1 = get_data('data/BalancedCreditCardDataset.csv', "Unnamed: 0", 1)  # second dataset
+    data_1_vc = pd.DataFrame(data_1['Class'].value_counts())
+    data_1_list = data_1.columns.to_list()
+    # write up for the second dataset
+    st.write(f'''The second Data set provided has the shape {data_1.shape} and contained the 
+    variables {data_1_list} which was used to build the model because of it was balanced from the 
+    first dataset 
+            the class variable(Target) had 2000 valid transactions and 2000 fraudulent transactions 
             which will be enough to predict and get the best accuracy for this model.
       ''')
 
-      # showing the dataset and visualizing the values of the target variable
-      st.write(pd.DataFrame(data_1).head(50))
-      st.bar_chart(data_1_vc, width=600, height=400)
+    # showing the dataset and visualizing the values of the target variable
+    st.write(pd.DataFrame(data_1).head(50))
+    st.bar_chart(data_1_vc, width=600, height=400)
 
-
-      # getting the number of the fraudlent transaction and Valid transaction.....
-      fraud = data_1[data_1['Class']==1]
-      normal = data_1[data_1['Class'] == 0]
-      st.write ('Fraudlent Transactions of the first dataset(1): {}'.format(len(fraud)))
-      st.write('Non-Fraudlent Transactions of the first dataset(0): {}'.format(len(normal)))
-      st.write(f'Number Classes: {len(np.unique(data_1["Class"]))}')
+    # getting the number of the fraudulent transaction and Valid transaction.....
+    fraud = data_1[data_1['Class'] == 1]
+    normal = data_1[data_1['Class'] == 0]
+    st.write('Fraudulent Transactions of the first dataset(1): {}'.format(len(fraud)))
+    st.write('Non-Fraudulent Transactions of the first dataset(0): {}'.format(len(normal)))
+    st.write(f'Number Classes: {len(np.unique(data_1["Class"]))}')
 
 # Side bar for predicting
-page = st.sidebar.selectbox('Select Your Model', ['Decision Tree', 'Random Forest Classifier', 'Extreme Gradient Boosting '])
+page = st.sidebar.selectbox('Select Your Model', ['Decision Tree', 'Random Forest Classifier',
+                                                  'Extreme Gradient Boosting '])
 st.cache(page)
-st.sidebar.write( '''
+st.sidebar.write('''
 NOTE: Values used to predict are them same as the values in the datasets.
 ''')
 st.sidebar.write("Now, Let's Get Predicting!!!!!")
 # variables in the datasets
 # Time Variable
-time = st.sidebar.slider('Time', min_value=1000.000000, max_value=200000.0000, value=1000.0000, step=1000.0500)
+time = st.sidebar.slider('Time', min_value=1000.000000, max_value=200000.0000, value=1000.0000,
+                         step=1000.0500)
 # V1 - V27 variables
 v1 = st.sidebar.slider('V1', min_value=-100.0000, max_value=100.0000, value=-80.0000, step=0.0500)
 v2 = st.sidebar.slider('V2', min_value=-100.0000, max_value=100.0000, value=-80.0000, step=0.0500)
@@ -147,22 +154,18 @@ v26 = st.sidebar.slider('V26', min_value=-100.0000, max_value=100.0000, value=-8
 v27 = st.sidebar.slider('V27', min_value=-100.0000, max_value=100.0000, value=-80.0000, step=0.0500)
 v28 = st.sidebar.slider('V28', min_value=-100.0000, max_value=100.0000, value=-80.0000, step=0.0500)
 # Amount variable
-amount = st.sidebar.slider('Amount', min_value=0.0000, max_value=1000000.0000, value=100.0000, step=200.0000)
+amount = st.sidebar.slider('Amount', min_value=0.0000, max_value=1000000.0000, value=100.0000,
+                           step=200.0000)
 # Predict Button
 predict_button = st.sidebar.button('Predict')
-names = ['Time', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10', 'V11', 'V12', 'V13', 'V14', 'V15', 'V16',
-         'V17', 'V18', 'V19', 'V20', 'V21', 'V22', 'V23', 'V24', 'V25', 'V26', 'V27', 'V28', 'Amount']
-X = np.array([time,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,v13,v14,v15,v16,v17,v18,v19,v20,v21,v22,v23,v24,v25,v26,v27,v28,amount])
+names = ['Time', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10', 'V11', 'V12', 'V13',
+         'V14', 'V15', 'V16',
+         'V17', 'V18', 'V19', 'V20', 'V21', 'V22', 'V23', 'V24', 'V25', 'V26', 'V27', 'V28',
+         'Amount']
+X = np.array(
+    [time, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,
+     v20, v21, v22, v23, v24, v25, v26, v27, v28, amount])
 data = pd.DataFrame([X], columns=names).astype("int")
-
-# Model Building
-# imports for model algorithms and model evaluation
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-import xgboost as xgb
-# Mean Squared error
-from sklearn.metrics import mean_squared_error
-
 
 
 # separating the feature from the target variable.......by slicing the dataset
@@ -170,42 +173,56 @@ x = data_1.iloc[:, :-1]
 y = data_1.iloc[:, -1]
 
 if page == 'Decision Tree':
-      # Decision Tree Classifier
-      dtree_2 = DecisionTreeClassifier(max_depth=5, min_samples_leaf=5)
-      dtree_2.fit(x,y.values)
-      if predict_button:
-            ypred_dtree_2 = dtree_2.predict(data)
-            
-            if st.sidebar.write(ypred_dtree_2[0]) == 1:
-                  st.sidebar.subheader('Beware Fraudlent Transaction!!!!')
-            else:
-                  st.sidebar.subheader('Valid Transaction')
-      else:
-            st.sidebar.write('Click to predict')
+    # Decision Tree Classifier
+    dtree_2 = DecisionTreeClassifier(max_depth=5, min_samples_leaf=5)
+    dtree_2.fit(x, y.values)
+    if predict_button:
+        ypred_dtree_2 = dtree_2.predict(data)
+        ypred_dtree_2 = ypred_dtree_2.astype('int')  # converting to integer value
+        pred_val = ypred_dtree_2[0]
+
+        if pred_val == 1:
+            st.sidebar.write(pred_val)
+            st.sidebar.subheader('Beware Fraudulent Transaction!!!!')
+        else:
+            st.sidebar.write(pred_val)
+            st.sidebar.subheader('Valid Transaction')
+    else:
+        st.sidebar.write('Click to predict')
 
 elif page == 'Random Forest Classifier':
-      # Random Forest Classifier
-      rf = RandomForestClassifier(n_estimators= 150, min_samples_split=5, min_samples_leaf=5)
-      rf.fit(x, y.values)
-      if predict_button:
-            ypred_rf = rf.predict(data)
-            if st.sidebar.write(ypred_rf[0]) == 1:
-                  st.sidebar.subheader('Beware Fraudlent Transaction!!!!')
-            else:
-                  st.sidebar.subheader('Valid Transaction')
-      else:
-            st.sidebar.write('Click to predict')
+    # Random Forest Classifier
+    rf = RandomForestClassifier(n_estimators=150, min_samples_split=5, min_samples_leaf=5)
+    rf.fit(x, y.values)
+    if predict_button:
+        ypred_rf = rf.predict(data)
+        ypred_rf = ypred_rf.astype('int')  # converting to integer values
+        pred_val = ypred_rf[0]
+
+        if pred_val == 1:
+            st.sidebar.subheader(pred_val)
+            st.sidebar.subheader('Beware Fraudulent Transaction!!!!')
+        else:
+            st.sidebar.subheader(pred_val)
+            st.sidebar.subheader('Valid Transaction')
+    else:
+        st.sidebar.write('Click to predict')
 
 else:
-# XGBoost Classfier
-      xgbc = xgb.XGBClassifier(objective='binary:logistic', use_label_encoder=True, n_estimators=100, n_jobs=5)
-      xgbc.fit(x, y.values)
-      if predict_button:
-            ypred_xgb = xgbc.predict(data)
-            if st.sidebar.write(ypred_xgb[0]) == 1:
-                  st.sidebar.subheader('Beware Fraudlent Transaction!!!!')
-            else:
-                  st.sidebar.subheader('Valid Transaction')
-      else:
-            st.sidebar.write('Click to predict')
-     
+    # XGBoost Classifier
+    xgbc = xgb.XGBClassifier(objective='binary:logistic', use_label_encoder=True, n_estimators=100,
+                             n_jobs=5)
+    xgbc.fit(x, y.values)
+    if predict_button:
+        ypred_xgb = xgbc.predict(data)
+        ypred_xgb = ypred_xgb.astype('int')  # converting to integer value
+        pred_val = ypred_xgb[0]
+
+        if pred_val == 1:
+            st.sidebar.subheader(pred_val)
+            st.sidebar.subheader('Beware Fraudulent Transaction!!!!')
+        else:
+            st.sidebar.subheader(pred_val)
+            st.sidebar.subheader('Valid Transaction')
+    else:
+        st.sidebar.write('Click to predict')

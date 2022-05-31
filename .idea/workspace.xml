@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="34843c8f-8a4e-4de4-905f-f3e6db4e6855" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/BalancedCreditCardDataset.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_streamlit.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_streamlit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sampled_creditcard.csv" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

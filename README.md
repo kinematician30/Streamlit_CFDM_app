@@ -1,4 +1,6 @@
 # Streamlit_CFDM_app
+
+https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white
 ## _Credit Card Fraud Detection_
 This project was built as machine learning project [Type: Classification]. The original dataset 
 is the Credit Card Fraud Detection dataset on kaggle 
